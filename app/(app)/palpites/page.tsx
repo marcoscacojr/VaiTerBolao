@@ -2,6 +2,49 @@
 
 import { useEffect, useState } from 'react'
 
+const regras = [
+  { pts: 10, icone: '🎯', desc: 'Placar exato' },
+  { pts: 5,  icone: '✅', desc: 'Acertou o vencedor (placar errado)' },
+  { pts: 3,  icone: '🤝', desc: 'Acertou o empate (placar errado)' },
+  { pts: 0,  icone: '❌', desc: 'Errou o resultado' },
+]
+
+function TabelaPontuacao() {
+  const [aberta, setAberta] = useState(false)
+
+  return (
+    <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+      <button
+        onClick={() => setAberta((v) => !v)}
+        className="w-full flex justify-between items-center px-4 py-3 text-sm font-semibold"
+        style={{ color: 'var(--text)' }}
+      >
+        <span>🏅 Como funciona a pontuação?</span>
+        <span style={{ color: 'var(--text-muted)' }}>{aberta ? '▲' : '▼'}</span>
+      </button>
+
+      {aberta && (
+        <div className="border-t" style={{ borderColor: 'var(--border)' }}>
+          {regras.map((r) => (
+            <div
+              key={r.pts}
+              className="flex items-center justify-between px-4 py-2.5 border-b last:border-b-0 text-sm"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              <span style={{ color: 'var(--text)' }}>
+                {r.icone} {r.desc}
+              </span>
+              <span className="font-bold text-green-600 dark:text-green-400 ml-4 shrink-0">
+                {r.pts > 0 ? `+${r.pts} pts` : '0 pts'}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 type Palpite = { palpite_casa: number; palpite_fora: number; pontos: number | null } | null
 type Partida = {
   id: string; fase: string; grupo: string | null
@@ -151,6 +194,8 @@ export default function PalpitesPage() {
   return (
     <div className="max-w-lg mx-auto px-4 py-6 flex flex-col gap-6">
       <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Palpites</h1>
+
+      <TabelaPontuacao />
 
       {partidas.length === 0 && (
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Nenhum jogo cadastrado ainda.</p>
