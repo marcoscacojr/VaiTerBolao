@@ -13,7 +13,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erro: 'Dados incompletos.' }, { status: 400 })
   }
 
-  // Busca o jogo para checar o horário
+  const casa = Number(palpite_casa)
+  const fora = Number(palpite_fora)
+
+  if (
+    !Number.isInteger(casa) || !Number.isInteger(fora) ||
+    casa < 0 || fora < 0 || casa > 99 || fora > 99
+  ) {
+    return NextResponse.json({ erro: 'Placar inválido.' }, { status: 400 })
+  }
+
   const { data: partida } = await supabase
     .from('matches')
     .select('data_hora, encerrado')
@@ -36,17 +45,10 @@ export async function POST(request: NextRequest) {
 
   if (!membro) return NextResponse.json({ erro: 'Você não pertence a nenhum grupo.' }, { status: 403 })
 
-  // Upsert: cria ou atualiza palpite existente
   const { error } = await supabase
     .from('predictions')
     .upsert(
-      {
-        user_id: session.id,
-        match_id,
-        group_id: membro.group_id,
-        palpite_casa: Number(palpite_casa),
-        palpite_fora: Number(palpite_fora),
-      },
+      { user_id: session.id, match_id, group_id: membro.group_id, palpite_casa: casa, palpite_fora: fora },
       { onConflict: 'user_id,match_id,group_id' }
     )
 
