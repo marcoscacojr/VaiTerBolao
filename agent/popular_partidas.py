@@ -12,9 +12,9 @@ Flags opcionais:
 
 import os
 import sys
+import uuid
 import argparse
 import requests
-from datetime import timezone
 from supabase import create_client
 
 # ---------------------------------------------------------------------------
@@ -61,6 +61,16 @@ def buscar_partidas_api() -> list[dict]:
     return resp.json().get("matches", [])
 
 
+PLACEHOLDERS = {"tbd", "to be defined", "winner", "loser", "runner-up"}
+
+def time_definido(nome: str | None) -> bool:
+    """Retorna False se o time ainda não está definido (TBD, Winner Group X, etc.)."""
+    if not nome:
+        return False
+    nome_lower = nome.lower().strip()
+    return not any(p in nome_lower for p in PLACEHOLDERS)
+
+
 def converter_partida(match: dict) -> dict | None:
     """Converte um objeto da API para o formato do banco."""
     stage = match.get("stage", "")
@@ -69,19 +79,26 @@ def converter_partida(match: dict) -> dict | None:
     if fase is None:
         return None  # Estágio desconhecido, pula
 
+    time_casa = match["homeTeam"].get("name")
+    time_fora = match["awayTeam"].get("name")
+
+    # Pula jogos onde os times ainda não estão definidos (fase eliminatória pendente)
+    if not time_definido(time_casa) or not time_definido(time_fora):
+        return None
+
     # Grupo: "GROUP_A" → "A", None na fase eliminatória
     grupo_raw = match.get("group")
     grupo = grupo_raw.replace("GROUP_", "") if grupo_raw else None
 
     return {
-        "fase":       fase,
-        "grupo":      grupo,
-        "time_casa":  match["homeTeam"]["name"],
-        "time_fora":  match["awayTeam"]["name"],
-        "data_hora":  match["utcDate"],  # ISO 8601 UTC — o Supabase aceita direto
+        "fase":        fase,
+        "grupo":       grupo,
+        "time_casa":   time_casa,
+        "time_fora":   time_fora,
+        "data_hora":   match["utcDate"],  # ISO 8601 UTC — o Supabase aceita direto
         "placar_casa": None,
         "placar_fora": None,
-        "encerrado":  False,
+        "encerrado":   False,
     }
 
 

@@ -101,9 +101,14 @@ bolao-copa/
 ## Status de implementação
 - [x] Banco criado no Supabase
 - [x] Projeto Next.js 16 inicializado
-- [ ] Auth (cadastro/login)
-- [ ] Grupos (criar/entrar por código)
-- [ ] Palpites
-- [ ] Resultados + pontuação
-- [ ] Ranking
-- [ ] Agente Python + GitHub Actions
+- [x] Auth (cadastro/login)
+- [x] Grupos (criar/entrar por código)
+- [x] Palpites
+- [x] Resultados + pontuação
+- [x] Ranking
+- [x] Agente Python + GitHub Actions
+- [x] Partidas da Copa populadas no banco
+
+## Observações do banco
+- Tabela `matches` usa `id` inteiro com sequence `matches_id_seq` para auto-incremento
+- Nomes dos times no banco são idênticos aos retornados pela football-data.org (necessário para o agente funcionar)
