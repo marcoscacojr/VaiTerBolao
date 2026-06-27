@@ -31,6 +31,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 # Mapeamento stage da API → fase no banco
 STAGE_MAP = {
     "GROUP_STAGE":    "grupos",
+  "LAST_32": "rodada_de_32",
     "LAST_16":        "oitavas",
     "QUARTER_FINALS": "quartas",
     "SEMI_FINALS":    "semi",
